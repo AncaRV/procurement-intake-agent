@@ -6,10 +6,6 @@ An AI agent built on the [Beam AI](https://beam.ai) platform that turns free-tex
 
 > Personal project, October 2026. All test data is fictional.
 
-## Demo
-
-[Video walkthrough](ADD-YOUR-VIDEO-LINK-HERE) (Flow, a successful run, a failure and its fix, the iteration log)
-
 ## Architecture
 
 ```
