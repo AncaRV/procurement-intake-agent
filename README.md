@@ -4,6 +4,8 @@ An AI agent built on the [Beam AI](https://beam.ai) platform that turns free-tex
 
 **Design principle:** the model extracts, deterministic code decides. Nothing is approved because a model guessed.
 
+The extraction prompt was first prototyped in a Claude Project, then deployed on Beam with deterministic routing code. See [comparison.md](comparison.md) for what changed between the two.
+
 > Personal project, October 2026. All test data is fictional.
 
 ## Architecture
@@ -44,11 +46,22 @@ Final version: prompt v4 on GPT 5.4, 6 of 6 routed correctly. Full details in [t
 
 | Version | Where | Change | Outcome |
 |---|---|---|---|
-| v1 | Chat model | Baseline | Critical fields correct, injection caught; test 6 wrongly flagged; no rule for units |
-| v2 | Chat model | Discount rule, default unit "piece" | Tests 1 and 6 fixed; **regression** on test 2, caught by re-running the full set |
-| v3 | Chat model | "piece" only when quantity is stated | All 6 pass |
+| v1 | Claude (Claude Project) | Baseline | Critical fields correct, injection caught; test 6 wrongly flagged; no rule for units |
+| v2 | Claude (Claude Project) | Discount rule, default unit "piece" | Tests 1 and 6 fixed; **regression** on test 2, caught by re-running the full set |
+| v3 | Claude (Claude Project) | "piece" only when quantity is stated | All 6 pass |
 | v3 | Beam, small model | Same prompt | Test 2 fails on the platform |
 | v4 | Beam, GPT 5.4 | Vague dates, ISO currency, team as department | All 6 routed correctly |
+
+## Prototype in Claude vs deployment on Beam
+
+| | Claude Project (prototype) | Beam (deployment) |
+|---|---|---|
+| Used for | Fast prompt iteration (v1 to v3) | Running the agent as a workflow (v3 to v4) |
+| Output | JSON as chat text, validated by hand | Typed fields enforced by the platform |
+| Routing | None, extraction only | Deterministic Python routing with guards |
+| Final result | v3 passed all 6 tests | v4 routed all 6 tests correctly |
+
+Both reach the same approval decision on all six tests. The only real difference is test 4: Claude left the total empty because the monthly price does not match the annual plan, while GPT 5.4 annualised it to 1,800. Full side-by-side in [comparison.md](comparison.md); Claude prompt, results and screenshots in [claude-version/](claude-version/).
 
 ## What broke on the platform and how I fixed it
 
@@ -80,3 +93,7 @@ The small default model cost about 2 credits per extraction but failed on incomp
 | [tests/results.md](tests/results.md) | Full iteration log and scores |
 | [routing/route.py](routing/route.py) | Routing code with both guards |
 | [screenshots/](screenshots/) | Beam Flow, runs and node settings |
+| [claude-version/prompt/instructions.md](claude-version/prompt/instructions.md) | Prompt v3 as used in the Claude Project |
+| [claude-version/tests/test-results.md](claude-version/tests/test-results.md) | Claude test results, checked rule by rule |
+| [claude-version/screenshots/](claude-version/screenshots/) | Claude test runs |
+| [comparison.md](comparison.md) | Claude prototype vs Beam deployment |
